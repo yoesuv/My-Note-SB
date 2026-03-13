@@ -31,8 +31,8 @@ class SecurityConfig(
             .formLogin { it.disable() }
             .httpBasic { it.disable() }
             .authorizeHttpRequests {
-                it.requestMatchers("/api/users/register").permitAll()
-                it.requestMatchers("/api/users/login").permitAll()
+                it.requestMatchers("/api/auth/register").permitAll()
+                it.requestMatchers("/api/auth/login").permitAll()
                 it.anyRequest().authenticated()
             }
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
