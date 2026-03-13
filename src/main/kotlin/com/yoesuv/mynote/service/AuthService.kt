@@ -45,10 +45,10 @@ class AuthService(
 
     fun login(request: LoginRequest): AuthResponse {
         val user = userRepository.findByEmail(request.email)
-            ?: throw IllegalArgumentException("Invalid email or password")
+            ?: throw IllegalArgumentException("Email not registered")
 
         if (!passwordEncoder.matches(request.password, user.passwordHash)) {
-            throw IllegalArgumentException("Invalid email or password")
+            throw IllegalArgumentException("Wrong password")
         }
 
         val token = jwtService.generateToken(user.email, user.id!!)
