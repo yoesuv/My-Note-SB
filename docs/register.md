@@ -70,7 +70,7 @@ curl -X POST http://localhost:8080/api/auth/register \
 
 ### 1. Email Already Registered
 
-**Status Code:** `400 Bad Request`
+**Status Code:** `409 Conflict`
 
 **Condition:** The provided email address is already registered in the system.
 
@@ -78,7 +78,7 @@ curl -X POST http://localhost:8080/api/auth/register \
 
 ```json
 {
-  "error": "Email already registered"
+  "error": "User already exists with email: test@example.com"
 }
 ```
 
@@ -227,7 +227,7 @@ curl -X POST http://localhost:8080/api/auth/register \
 ```json
 {
   "errors": {
-    "password": "Password must be at least 6 characters"
+    "password": "Password is required"
   }
 }
 ```
@@ -333,12 +333,12 @@ curl -X POST http://localhost:8080/api/auth/register \
 | Error Case | HTTP Status | Error Message | Error Format |
 |------------|-------------|---------------|--------------|
 | Register Success | 201 Created | - | AuthResponse object |
-| Email Already Registered | 400 Bad Request | "Email already registered" | `{"error": "..."}` |
+| Email Already Registered | 409 Conflict | "User already exists with email: ..." | `{"error": "..."}` |
 | Empty Full Name | 400 Bad Request | "Full name is required" | `{"errors": {"fullName": "..."}}` |
 | Full Name Too Short | 400 Bad Request | "Full name must be between 2 and 100 characters" | `{"errors": {"fullName": "..."}}` |
 | Empty Email | 400 Bad Request | "Email is required" | `{"errors": {"email": "..."}}` |
 | Invalid Email Format | 400 Bad Request | "Invalid email format" | `{"errors": {"email": "..."}}` |
-| Empty Password | 400 Bad Request | "Password must be at least 6 characters" | `{"errors": {"password": "..."}}` |
+| Empty Password | 400 Bad Request | "Password is required" | `{"errors": {"password": "..."}}` |
 | Password Too Short | 400 Bad Request | "Password must be at least 6 characters" | `{"errors": {"password": "..."}}` |
 | Missing All Fields | 400 Bad Request | Multiple validation messages | `{"errors": {...}}` |
 | Invalid JSON | 400 Bad Request | "Invalid JSON format" | `{"error": "..."}` |
@@ -351,8 +351,8 @@ curl -X POST http://localhost:8080/api/auth/register \
 | fullName | Min 2, Max 100 characters | "Full name must be between 2 and 100 characters" |
 | email | Required, not blank | "Email is required" |
 | email | Valid email format | "Invalid email format" |
-| email | Must be unique | "Email already registered" |
-| password | Required, not blank | "Password is required" (shown as min length for empty) |
+| email | Must be unique | "User already exists with email: ..." |
+| password | Required, not blank | "Password is required" |
 | password | Minimum 6 characters | "Password must be at least 6 characters" |
 
 ## Notes

@@ -68,7 +68,7 @@ curl -X POST http://localhost:8080/api/auth/login \
 
 ### 1. Wrong Email (Email Not Registered)
 
-**Status Code:** `400 Bad Request`
+**Status Code:** `401 Unauthorized`
 
 **Condition:** The provided email address is not registered in the system.
 
@@ -95,7 +95,7 @@ curl -X POST http://localhost:8080/api/auth/login \
 
 ### 2. Wrong Password
 
-**Status Code:** `400 Bad Request`
+**Status Code:** `401 Unauthorized`
 
 **Condition:** The provided password does not match the registered email.
 
@@ -263,8 +263,8 @@ curl -X POST http://localhost:8080/api/auth/login \
 | Error Case | HTTP Status | Error Message | Error Format |
 |------------|-------------|---------------|--------------|
 | Login Success | 200 OK | - | AuthResponse object |
-| Wrong Email | 400 Bad Request | "Email not registered" | `{"error": "..."}` |
-| Wrong Password | 400 Bad Request | "Wrong password" | `{"error": "..."}` |
+| Wrong Email | 401 Unauthorized | "Email not registered" | `{"error": "..."}` |
+| Wrong Password | 401 Unauthorized | "Wrong password" | `{"error": "..."}` |
 | Empty Email | 400 Bad Request | "Email is required" | `{"errors": {"email": "..."}}` |
 | Invalid Email Format | 400 Bad Request | "Invalid email format" | `{"errors": {"email": "..."}}` |
 | Empty Password | 400 Bad Request | "Password is required" | `{"errors": {"password": "..."}}` |
