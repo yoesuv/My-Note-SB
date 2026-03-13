@@ -1,8 +1,8 @@
 package com.yoesuv.mynote.controller
 
-import com.yoesuv.mynote.dto.AuthResponse
-import com.yoesuv.mynote.dto.LoginRequest
-import com.yoesuv.mynote.dto.RegisterRequest
+import com.yoesuv.mynote.dto.auth.AuthResponse
+import com.yoesuv.mynote.dto.auth.LoginRequest
+import com.yoesuv.mynote.dto.auth.RegisterRequest
 import com.yoesuv.mynote.service.AuthService
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus

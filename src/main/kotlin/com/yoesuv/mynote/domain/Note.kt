@@ -1,4 +1,4 @@
-package com.yoesuv.mynote.database.models
+package com.yoesuv.mynote.domain
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -9,11 +9,10 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
-import java.time.LocalDateTime
 
 @Entity
-@Table(name = "categories")
-data class Category(
+@Table(name = "notes")
+data class Note(
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,16 +22,17 @@ data class Category(
     @JoinColumn(name = "user_id", nullable = false)
     val user: User,
 
-    @Column(name = "name", nullable = false, length = 100)
-    var name: String,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = true)
+    var category: Category? = null,
 
-    @Column(name = "color", length = 7)
-    var color: String? = null,
+    @Column(name = "title", nullable = false, length = 200)
+    var title: String,
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    val createdAt: LocalDateTime = LocalDateTime.now(),
+    @Column(name = "content", columnDefinition = "TEXT")
+    var content: String? = null,
 
-    @Column(name = "updated_at", nullable = false)
-    var updatedAt: LocalDateTime = LocalDateTime.now()
+    @Column(name = "is_pinned", nullable = false)
+    var isPinned: Boolean = false
 
-)
+) : BaseAuditEntity()

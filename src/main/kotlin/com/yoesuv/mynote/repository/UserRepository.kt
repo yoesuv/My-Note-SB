@@ -1,6 +1,6 @@
 package com.yoesuv.mynote.repository
 
-import com.yoesuv.mynote.database.models.User
+import com.yoesuv.mynote.domain.User
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 

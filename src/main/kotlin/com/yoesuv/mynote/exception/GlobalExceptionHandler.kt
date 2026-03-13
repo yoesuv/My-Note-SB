@@ -1,5 +1,9 @@
 package com.yoesuv.mynote.exception
 
+import com.yoesuv.mynote.exception.errors.EntityNotFoundException
+import com.yoesuv.mynote.exception.errors.InvalidCredentialsException
+import com.yoesuv.mynote.exception.errors.UnauthorizedException
+import com.yoesuv.mynote.exception.errors.UserAlreadyExistsException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -37,6 +41,38 @@ class GlobalExceptionHandler {
         return ResponseEntity
             .status(ex.statusCode)
             .body(mapOf("error" to (ex.reason ?: "An error occurred")))
+    }
+
+    @ExceptionHandler(EntityNotFoundException::class)
+    fun handleEntityNotFoundException(ex: EntityNotFoundException): ResponseEntity<Map<String, String>> {
+        log.warn("Entity not found: {}", ex.message)
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(mapOf("error" to (ex.message ?: "Entity not found")))
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException::class)
+    fun handleUserAlreadyExistsException(ex: UserAlreadyExistsException): ResponseEntity<Map<String, String>> {
+        log.warn("User already exists: {}", ex.message)
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(mapOf("error" to (ex.message ?: "User already exists")))
+    }
+
+    @ExceptionHandler(InvalidCredentialsException::class)
+    fun handleInvalidCredentialsException(ex: InvalidCredentialsException): ResponseEntity<Map<String, String>> {
+        log.warn("Invalid credentials: {}", ex.message)
+        return ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
+            .body(mapOf("error" to (ex.message ?: "Invalid credentials")))
+    }
+
+    @ExceptionHandler(UnauthorizedException::class)
+    fun handleUnauthorizedException(ex: UnauthorizedException): ResponseEntity<Map<String, String>> {
+        log.warn("Unauthorized: {}", ex.message)
+        return ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
+            .body(mapOf("error" to (ex.message ?: "Unauthorized")))
     }
 
     @ExceptionHandler(IllegalArgumentException::class)

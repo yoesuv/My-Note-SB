@@ -1,4 +1,4 @@
-package com.yoesuv.mynote.dto
+package com.yoesuv.mynote.dto.auth
 
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank

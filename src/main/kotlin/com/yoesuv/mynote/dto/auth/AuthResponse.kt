@@ -1,4 +1,4 @@
-package com.yoesuv.mynote.dto
+package com.yoesuv.mynote.dto.auth
 
 data class AuthResponse(
     val token: String,
