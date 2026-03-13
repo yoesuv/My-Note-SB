@@ -44,10 +44,10 @@ class AuthService(
     }
 
     fun login(request: LoginRequest): AuthResponse {
-        val user = userRepository.findByEmail(request.email)
+        val user = userRepository.findByEmail(request.email!!)
             ?: throw IllegalArgumentException("Email not registered")
 
-        if (!passwordEncoder.matches(request.password, user.passwordHash)) {
+        if (!passwordEncoder.matches(request.password!!, user.passwordHash)) {
             throw IllegalArgumentException("Wrong password")
         }
 

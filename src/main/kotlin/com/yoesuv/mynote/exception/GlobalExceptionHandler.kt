@@ -3,6 +3,7 @@ package com.yoesuv.mynote.exception
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
@@ -20,6 +21,14 @@ class GlobalExceptionHandler {
         }
         log.warn("Validation failed: {}", errors)
         return ResponseEntity.badRequest().body(mapOf("errors" to errors))
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException::class)
+    fun handleHttpMessageNotReadableException(ex: HttpMessageNotReadableException): ResponseEntity<Map<String, String>> {
+        log.warn("Request body parsing failed: {}", ex.message)
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(mapOf("error" to "Invalid JSON format"))
     }
 
     @ExceptionHandler(ResponseStatusException::class)
