@@ -20,14 +20,14 @@ class AuthService(
 
     @Transactional
     fun register(request: RegisterRequest): AuthResponse {
-        if (userRepository.existsByEmail(request.email)) {
+        if (userRepository.existsByEmail(request.email!!)) {
             throw IllegalArgumentException("Email already registered")
         }
 
         val user = User(
-            fullName = request.fullName,
-            email = request.email,
-            passwordHash = passwordEncoder.encode(request.password),
+            fullName = request.fullName!!,
+            email = request.email!!,
+            passwordHash = passwordEncoder.encode(request.password!!),
             createdAt = LocalDateTime.now(),
             updatedAt = LocalDateTime.now()
         )
