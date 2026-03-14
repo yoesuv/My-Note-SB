@@ -1,5 +1,6 @@
 package com.yoesuv.mynote.exception
 
+import com.yoesuv.mynote.exception.errors.CategoryAlreadyExistsException
 import com.yoesuv.mynote.exception.errors.EntityNotFoundException
 import com.yoesuv.mynote.exception.errors.InvalidCredentialsException
 import com.yoesuv.mynote.exception.errors.UnauthorizedException
@@ -73,6 +74,14 @@ class GlobalExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.UNAUTHORIZED)
             .body(mapOf("error" to (ex.message ?: "Unauthorized")))
+    }
+
+    @ExceptionHandler(CategoryAlreadyExistsException::class)
+    fun handleCategoryAlreadyExistsException(ex: CategoryAlreadyExistsException): ResponseEntity<Map<String, String>> {
+        log.warn("Category already exists: {}", ex.message)
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(mapOf("error" to (ex.message ?: "Category already exists")))
     }
 
     @ExceptionHandler(IllegalArgumentException::class)

@@ -11,3 +11,6 @@ class InvalidCredentialsException(message: String = "Invalid email or password")
 
 class UnauthorizedException(message: String = "Unauthorized access") :
     RuntimeException(message)
+
+class CategoryAlreadyExistsException(name: String) :
+    RuntimeException("Category already exists with name: $name")
