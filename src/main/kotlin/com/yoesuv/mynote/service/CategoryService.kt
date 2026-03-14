@@ -35,7 +35,8 @@ class CategoryService(
     @Transactional
     fun createCategory(request: CategoryRequest): CategoryResponse {
         val user = getCurrentUser()
-        val name = request.name!!
+        val name = request.name!!.trim()
+        val color = request.color?.trim()
 
         if (categoryRepository.existsByUserIdAndName(user.id!!, name)) {
             throw CategoryAlreadyExistsException(name)
@@ -44,7 +45,7 @@ class CategoryService(
         val category = Category(
             user = user,
             name = name,
-            color = request.color
+            color = color
         )
 
         val savedCategory = categoryRepository.save(category)
@@ -58,14 +59,15 @@ class CategoryService(
         val category = categoryRepository.findByIdAndUserId(id, userId)
             ?: throw EntityNotFoundException("Category", id)
 
-        val newName = request.name!!
+        val newName = request.name!!.trim()
+        val newColor = request.color?.trim()
 
         if (categoryRepository.existsByUserIdAndNameAndIdNot(userId, newName, id)) {
             throw CategoryAlreadyExistsException(newName)
         }
 
         category.name = newName
-        category.color = request.color
+        category.color = newColor
 
         val updatedCategory = categoryRepository.save(category)
         return updatedCategory.toResponse()
