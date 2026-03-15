@@ -62,16 +62,28 @@ my-note/
    cd my-note
    ```
 
-2. **Configure database**
+2. **Create database**
    
-   Create a PostgreSQL database and update `src/main/resources/application.properties`:
+   Create a PostgreSQL database (tables will be auto-created on first run):
+   ```sql
+   CREATE DATABASE mynotes;
+   ```
+   
+   Or using psql:
+   ```bash
+   psql -U postgres -c "CREATE DATABASE mynotes;"
+   ```
+
+3. **Configure database connection**
+   
+   Update `src/main/resources/application.properties`:
    ```properties
-   spring.datasource.url=jdbc:postgresql://localhost:5432/mynote
+   spring.datasource.url=jdbc:postgresql://localhost:5432/mynotes
    spring.datasource.username=your_username
    spring.datasource.password=your_password
    ```
 
-3. **Configure JWT** (optional)
+4. **Configure JWT** (optional)
    
    Update JWT settings in `application.properties`:
    ```properties
@@ -79,7 +91,7 @@ my-note/
    jwt.expiration=86400000
    ```
 
-4. **Run the application**
+5. **Run the application**
    ```bash
    ./gradlew bootRun
    ```
