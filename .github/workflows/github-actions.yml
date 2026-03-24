@@ -13,6 +13,22 @@ on:
 jobs:
   Build-and-Test:
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: mynotes
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
@@ -31,6 +47,10 @@ jobs:
 
       - name: Run tests with coverage
         run: ./gradlew test jacocoTestReport
+        env:
+          DB_URL: jdbc:postgresql://localhost:5432/mynotes
+          DB_USERNAME: postgres
+          DB_PASSWORD: password
 
       - name: Upload coverage report to Codacy
         uses: codacy/codacy-coverage-reporter-action@v1.3.0
@@ -40,5 +60,9 @@ jobs:
 
       - name: Build jar
         run: ./gradlew build
+        env:
+          DB_URL: jdbc:postgresql://localhost:5432/mynotes
+          DB_USERNAME: postgres
+          DB_PASSWORD: password
 
       - run: echo "Job completed with status ${{ job.status }}."
