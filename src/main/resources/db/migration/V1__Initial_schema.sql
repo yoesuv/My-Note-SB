@@ -31,13 +31,13 @@ CREATE TABLE IF NOT EXISTS notes (
 );
 
 -- Add foreign key constraints
-ALTER TABLE categories 
+ALTER TABLE dbo.categories 
     ADD CONSTRAINT fk_categories_user 
-    FOREIGN KEY (user_id) REFERENCES users(id);
+    FOREIGN KEY (user_id) REFERENCES dbo.users(id);
 
-ALTER TABLE notes 
+ALTER TABLE dbo.notes 
     ADD CONSTRAINT fk_notes_user 
-    FOREIGN KEY (user_id) REFERENCES users(id);
+    FOREIGN KEY (user_id) REFERENCES dbo.users(id);
 
 ALTER TABLE notes 
     ADD CONSTRAINT fk_notes_category 
