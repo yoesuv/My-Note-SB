@@ -1,5 +1,8 @@
 # My Note API
 
+[![Build Status](https://github.com/yoesuv/My-Note-SB/actions/workflows/github-action.yml/badge.svg)](https://github.com/yoesuv/My-Note-SB/actions)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/05da8d3007824831b3cc199fdef71f6c)](https://app.codacy.com/gh/yoesuv/My-Note-SB/dashboard)
+
 A **Spring Boot** RESTful API for a personal note-taking application with JWT authentication, built with Kotlin, Spring Data JPA, PostgreSQL, Flyway, Spring Security, and JJWT.
 
 ## Features
