@@ -45,6 +45,15 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          for i in {1..30}; do
+            pg_isready -h localhost -p 5432 -U postgres && echo "PostgreSQL is ready" && exit 0
+            echo "Waiting for PostgreSQL..."
+            sleep 1
+          done
+          echo "PostgreSQL failed to start" && exit 1
+
       - name: Run tests with coverage
         run: ./gradlew test jacocoTestReport
         env:
