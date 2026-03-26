@@ -29,6 +29,9 @@ class LoginTests {
         private const val KEY_EMAIL = "email"
         private const val KEY_PASSWORD = "password"
         private const val KEY_FULL_NAME = "fullName"
+        private const val JSON_PATH_ERROR = "$.error"
+        private const val JSON_PATH_ERRORS_EMAIL = "$.errors.email"
+        private const val JSON_PATH_ERRORS_PASSWORD = "$.errors.password"
     }
 
     @Autowired
@@ -99,7 +102,7 @@ class LoginTests {
                     .content(objectMapper.writeValueAsString(request))
             )
                 .andExpect(status().isUnauthorized)
-                .andExpect(jsonPath("$.error").value("Email not registered"))
+                .andExpect(jsonPath(JSON_PATH_ERROR).value("Email not registered"))
         }
 
         @Test
@@ -115,7 +118,7 @@ class LoginTests {
                     .content(objectMapper.writeValueAsString(request))
             )
                 .andExpect(status().isUnauthorized)
-                .andExpect(jsonPath("$.error").value("Wrong password"))
+                .andExpect(jsonPath(JSON_PATH_ERROR).value("Wrong password"))
         }
     }
 
@@ -134,7 +137,7 @@ class LoginTests {
                     .content(objectMapper.writeValueAsString(request))
             )
                 .andExpect(status().isBadRequest)
-                .andExpect(jsonPath("$.errors.email").value("Email is required"))
+                .andExpect(jsonPath(JSON_PATH_ERRORS_EMAIL).value("Email is required"))
         }
 
         @Test
@@ -150,7 +153,7 @@ class LoginTests {
                     .content(objectMapper.writeValueAsString(request))
             )
                 .andExpect(status().isBadRequest)
-                .andExpect(jsonPath("$.errors.email").value("Invalid email format"))
+                .andExpect(jsonPath(JSON_PATH_ERRORS_EMAIL).value("Invalid email format"))
         }
 
         @Test
@@ -166,7 +169,7 @@ class LoginTests {
                     .content(objectMapper.writeValueAsString(request))
             )
                 .andExpect(status().isBadRequest)
-                .andExpect(jsonPath("$.errors.password").value("Password is required"))
+                .andExpect(jsonPath(JSON_PATH_ERRORS_PASSWORD).value("Password is required"))
         }
 
         @Test
@@ -179,8 +182,8 @@ class LoginTests {
                     .content(objectMapper.writeValueAsString(request))
             )
                 .andExpect(status().isBadRequest)
-                .andExpect(jsonPath("$.errors.email").exists())
-                .andExpect(jsonPath("$.errors.password").exists())
+                .andExpect(jsonPath(JSON_PATH_ERRORS_EMAIL).exists())
+                .andExpect(jsonPath(JSON_PATH_ERRORS_PASSWORD).exists())
         }
 
         @Test
@@ -191,7 +194,7 @@ class LoginTests {
                     .content("not-valid-json")
             )
                 .andExpect(status().isBadRequest)
-                .andExpect(jsonPath("$.error").value("Invalid JSON format"))
+                .andExpect(jsonPath(JSON_PATH_ERROR).value("Invalid JSON format"))
         }
     }
 }

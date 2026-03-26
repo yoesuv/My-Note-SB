@@ -29,6 +29,10 @@ class RegisterTests {
         private const val KEY_EMAIL = "email"
         private const val KEY_PASSWORD = "password"
         private const val KEY_FULL_NAME = "fullName"
+        private const val JSON_PATH_ERROR = "$.error"
+        private const val JSON_PATH_ERRORS_FULL_NAME = "$.errors.fullName"
+        private const val JSON_PATH_ERRORS_EMAIL = "$.errors.email"
+        private const val JSON_PATH_ERRORS_PASSWORD = "$.errors.password"
     }
 
     @Autowired
@@ -96,7 +100,7 @@ class RegisterTests {
                     .content(objectMapper.writeValueAsString(request))
             )
                 .andExpect(status().isConflict)
-                .andExpect(jsonPath("$.error").value("User already exists with email: $TEST_EMAIL"))
+                .andExpect(jsonPath(JSON_PATH_ERROR).value("User already exists with email: $TEST_EMAIL"))
         }
     }
 
@@ -116,7 +120,7 @@ class RegisterTests {
                     .content(objectMapper.writeValueAsString(request))
             )
                 .andExpect(status().isBadRequest)
-                .andExpect(jsonPath("$.errors.fullName").value("Full name is required"))
+                .andExpect(jsonPath(JSON_PATH_ERRORS_FULL_NAME).value("Full name is required"))
         }
 
         @Test
@@ -133,7 +137,7 @@ class RegisterTests {
                     .content(objectMapper.writeValueAsString(request))
             )
                 .andExpect(status().isBadRequest)
-                .andExpect(jsonPath("$.errors.fullName").value("Full name must be between 2 and 100 characters"))
+                .andExpect(jsonPath(JSON_PATH_ERRORS_FULL_NAME).value("Full name must be between 2 and 100 characters"))
         }
 
         @Test
@@ -150,7 +154,7 @@ class RegisterTests {
                     .content(objectMapper.writeValueAsString(request))
             )
                 .andExpect(status().isBadRequest)
-                .andExpect(jsonPath("$.errors.email").value("Email is required"))
+                .andExpect(jsonPath(JSON_PATH_ERRORS_EMAIL).value("Email is required"))
         }
 
         @Test
@@ -167,7 +171,7 @@ class RegisterTests {
                     .content(objectMapper.writeValueAsString(request))
             )
                 .andExpect(status().isBadRequest)
-                .andExpect(jsonPath("$.errors.email").value("Invalid email format"))
+                .andExpect(jsonPath(JSON_PATH_ERRORS_EMAIL).value("Invalid email format"))
         }
 
         @Test
@@ -184,7 +188,7 @@ class RegisterTests {
                     .content(objectMapper.writeValueAsString(request))
             )
                 .andExpect(status().isBadRequest)
-                .andExpect(jsonPath("$.errors.password").value("Password is required"))
+                .andExpect(jsonPath(JSON_PATH_ERRORS_PASSWORD).value("Password is required"))
         }
 
         @Test
@@ -201,7 +205,7 @@ class RegisterTests {
                     .content(objectMapper.writeValueAsString(request))
             )
                 .andExpect(status().isBadRequest)
-                .andExpect(jsonPath("$.errors.password").value("Password must be at least 6 characters"))
+                .andExpect(jsonPath(JSON_PATH_ERRORS_PASSWORD).value("Password must be at least 6 characters"))
         }
 
         @Test
@@ -214,9 +218,9 @@ class RegisterTests {
                     .content(objectMapper.writeValueAsString(request))
             )
                 .andExpect(status().isBadRequest)
-                .andExpect(jsonPath("$.errors.password").exists())
-                .andExpect(jsonPath("$.errors.fullName").exists())
-                .andExpect(jsonPath("$.errors.email").exists())
+                .andExpect(jsonPath(JSON_PATH_ERRORS_PASSWORD).exists())
+                .andExpect(jsonPath(JSON_PATH_ERRORS_FULL_NAME).exists())
+                .andExpect(jsonPath(JSON_PATH_ERRORS_EMAIL).exists())
         }
 
         @Test
@@ -227,7 +231,7 @@ class RegisterTests {
                     .content("not-valid-json")
             )
                 .andExpect(status().isBadRequest)
-                .andExpect(jsonPath("$.error").value("Invalid JSON format"))
+                .andExpect(jsonPath(JSON_PATH_ERROR).value("Invalid JSON format"))
         }
     }
 }
