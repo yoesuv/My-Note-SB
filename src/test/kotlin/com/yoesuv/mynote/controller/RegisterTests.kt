@@ -21,6 +21,16 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @ActiveProfiles("test")
 class RegisterTests {
 
+    companion object {
+        private const val BASE_URL = "/api/auth/register"
+        private const val TEST_EMAIL = "test@example.com"
+        private const val TEST_PASSWORD = "password123"
+        private const val TEST_FULL_NAME = "Test User"
+        private const val KEY_EMAIL = "email"
+        private const val KEY_PASSWORD = "password"
+        private const val KEY_FULL_NAME = "fullName"
+    }
+
     @Autowired
     private lateinit var mockMvc: MockMvc
 
@@ -45,13 +55,13 @@ class RegisterTests {
         @Test
         fun `should register new user successfully`() {
             val request = mapOf(
-                "fullName" to "John Doe",
-                "email" to "john@example.com",
-                "password" to "securepassword"
+                KEY_FULL_NAME to "John Doe",
+                KEY_EMAIL to "john@example.com",
+                KEY_PASSWORD to "securepassword"
             )
 
             mockMvc.perform(
-                post("/api/auth/register")
+                post(BASE_URL)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
@@ -68,25 +78,25 @@ class RegisterTests {
         @Test
         fun `should return 409 when email already exists`() {
             val request = mapOf(
-                "fullName" to "Test User",
-                "email" to "test@example.com",
-                "password" to "password123"
+                KEY_FULL_NAME to TEST_FULL_NAME,
+                KEY_EMAIL to TEST_EMAIL,
+                KEY_PASSWORD to TEST_PASSWORD
             )
 
             mockMvc.perform(
-                post("/api/auth/register")
+                post(BASE_URL)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
                 .andExpect(status().isCreated)
 
             mockMvc.perform(
-                post("/api/auth/register")
+                post(BASE_URL)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
                 .andExpect(status().isConflict)
-                .andExpect(jsonPath("$.error").value("User already exists with email: test@example.com"))
+                .andExpect(jsonPath("$.error").value("User already exists with email: $TEST_EMAIL"))
         }
     }
 
@@ -95,13 +105,13 @@ class RegisterTests {
         @Test
         fun `should return 400 when fullName is empty`() {
             val request = mapOf(
-                "fullName" to "",
-                "email" to "test@example.com",
-                "password" to "password123"
+                KEY_FULL_NAME to "",
+                KEY_EMAIL to TEST_EMAIL,
+                KEY_PASSWORD to TEST_PASSWORD
             )
 
             mockMvc.perform(
-                post("/api/auth/register")
+                post(BASE_URL)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
@@ -112,13 +122,13 @@ class RegisterTests {
         @Test
         fun `should return 400 when fullName is too short`() {
             val request = mapOf(
-                "fullName" to "A",
-                "email" to "test@example.com",
-                "password" to "password123"
+                KEY_FULL_NAME to "A",
+                KEY_EMAIL to TEST_EMAIL,
+                KEY_PASSWORD to TEST_PASSWORD
             )
 
             mockMvc.perform(
-                post("/api/auth/register")
+                post(BASE_URL)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
@@ -129,13 +139,13 @@ class RegisterTests {
         @Test
         fun `should return 400 when email is empty`() {
             val request = mapOf(
-                "fullName" to "Test User",
-                "email" to "",
-                "password" to "password123"
+                KEY_FULL_NAME to TEST_FULL_NAME,
+                KEY_EMAIL to "",
+                KEY_PASSWORD to TEST_PASSWORD
             )
 
             mockMvc.perform(
-                post("/api/auth/register")
+                post(BASE_URL)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
@@ -146,13 +156,13 @@ class RegisterTests {
         @Test
         fun `should return 400 when email format is invalid`() {
             val request = mapOf(
-                "fullName" to "Test User",
-                "email" to "invalid-email",
-                "password" to "password123"
+                KEY_FULL_NAME to TEST_FULL_NAME,
+                KEY_EMAIL to "invalid-email",
+                KEY_PASSWORD to TEST_PASSWORD
             )
 
             mockMvc.perform(
-                post("/api/auth/register")
+                post(BASE_URL)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
@@ -163,13 +173,13 @@ class RegisterTests {
         @Test
         fun `should return 400 when password is empty`() {
             val request = mapOf(
-                "fullName" to "Test User",
-                "email" to "test@example.com",
-                "password" to ""
+                KEY_FULL_NAME to TEST_FULL_NAME,
+                KEY_EMAIL to TEST_EMAIL,
+                KEY_PASSWORD to ""
             )
 
             mockMvc.perform(
-                post("/api/auth/register")
+                post(BASE_URL)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
@@ -180,13 +190,13 @@ class RegisterTests {
         @Test
         fun `should return 400 when password is too short`() {
             val request = mapOf(
-                "fullName" to "Test User",
-                "email" to "test@example.com",
-                "password" to "12345"
+                KEY_FULL_NAME to TEST_FULL_NAME,
+                KEY_EMAIL to TEST_EMAIL,
+                KEY_PASSWORD to "12345"
             )
 
             mockMvc.perform(
-                post("/api/auth/register")
+                post(BASE_URL)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
@@ -199,7 +209,7 @@ class RegisterTests {
             val request = mapOf<String, String>()
 
             mockMvc.perform(
-                post("/api/auth/register")
+                post(BASE_URL)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
@@ -212,7 +222,7 @@ class RegisterTests {
         @Test
         fun `should return 400 when JSON format is invalid`() {
             mockMvc.perform(
-                post("/api/auth/register")
+                post(BASE_URL)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content("not-valid-json")
             )
