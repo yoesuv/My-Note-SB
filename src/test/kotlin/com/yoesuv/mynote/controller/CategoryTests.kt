@@ -44,6 +44,13 @@ class CategoryTests {
         private const val COLOR_RED = "#FF0000"
         private const val COLOR_GREEN = "#00FF00"
         private const val CATEGORY_WORK_UPDATED = "Work Updated"
+        private const val HEADER_AUTHORIZATION = "Authorization"
+        private const val BEARER_PREFIX = "Bearer "
+        private const val CATEGORY_NOT_FOUND_MSG = "Category not found with id:"
+        private const val CATEGORY_NAME_REQUIRED_MSG = "Category name is required"
+        private const val CATEGORY_NAME_LENGTH_MSG = "Category name must be between 2 and 100 characters"
+        private const val COLOR_MAX_LENGTH_MSG = "Color must be at most 20 characters"
+        private const val INVALID_JSON_MSG = "Invalid JSON format"
     }
 
     @Autowired
@@ -93,7 +100,7 @@ class CategoryTests {
         fun `should return empty list when no categories exist`() {
             mockMvc.perform(
                 get(BASE_URL)
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
             )
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$").isArray)
@@ -107,7 +114,7 @@ class CategoryTests {
 
             mockMvc.perform(
                 get(BASE_URL)
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
             )
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$").isArray)
@@ -131,7 +138,7 @@ class CategoryTests {
 
             mockMvc.perform(
                 get("$BASE_URL/$categoryId")
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
             )
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.id").value(categoryId))
@@ -143,10 +150,10 @@ class CategoryTests {
         fun `should return 404 when category not found`() {
             mockMvc.perform(
                 get("$BASE_URL/999")
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
             )
                 .andExpect(status().isNotFound)
-                .andExpect(jsonPath(JSON_PATH_ERROR).value("Category not found with id: 999"))
+                .andExpect(jsonPath(JSON_PATH_ERROR).value("$CATEGORY_NOT_FOUND_MSG 999"))
         }
 
         @Test
@@ -167,7 +174,7 @@ class CategoryTests {
 
             mockMvc.perform(
                 post(BASE_URL)
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
@@ -186,7 +193,7 @@ class CategoryTests {
 
             mockMvc.perform(
                 post(BASE_URL)
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
@@ -207,7 +214,7 @@ class CategoryTests {
 
             mockMvc.perform(
                 post(BASE_URL)
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
@@ -224,12 +231,12 @@ class CategoryTests {
 
             mockMvc.perform(
                 post(BASE_URL)
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
                 .andExpect(status().isBadRequest)
-                .andExpect(jsonPath(JSON_PATH_ERRORS_NAME).value("Category name is required"))
+                .andExpect(jsonPath(JSON_PATH_ERRORS_NAME).value(CATEGORY_NAME_REQUIRED_MSG))
         }
 
         @Test
@@ -241,12 +248,12 @@ class CategoryTests {
 
             mockMvc.perform(
                 post(BASE_URL)
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
                 .andExpect(status().isBadRequest)
-                .andExpect(jsonPath(JSON_PATH_ERRORS_NAME).value("Category name must be between 2 and 100 characters"))
+                .andExpect(jsonPath(JSON_PATH_ERRORS_NAME).value(CATEGORY_NAME_LENGTH_MSG))
         }
 
         @Test
@@ -258,12 +265,12 @@ class CategoryTests {
 
             mockMvc.perform(
                 post(BASE_URL)
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
                 .andExpect(status().isBadRequest)
-                .andExpect(jsonPath(JSON_PATH_ERRORS_NAME).value("Category name must be between 2 and 100 characters"))
+                .andExpect(jsonPath(JSON_PATH_ERRORS_NAME).value(CATEGORY_NAME_LENGTH_MSG))
         }
 
         @Test
@@ -275,12 +282,12 @@ class CategoryTests {
 
             mockMvc.perform(
                 post(BASE_URL)
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
                 .andExpect(status().isBadRequest)
-                .andExpect(jsonPath(JSON_PATH_ERRORS_COLOR).value("Color must be at most 20 characters"))
+                .andExpect(jsonPath(JSON_PATH_ERRORS_COLOR).value(COLOR_MAX_LENGTH_MSG))
         }
 
         @Test
@@ -291,24 +298,24 @@ class CategoryTests {
 
             mockMvc.perform(
                 post(BASE_URL)
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
                 .andExpect(status().isBadRequest)
-                .andExpect(jsonPath(JSON_PATH_ERRORS_NAME).value("Category name is required"))
+                .andExpect(jsonPath(JSON_PATH_ERRORS_NAME).value(CATEGORY_NAME_REQUIRED_MSG))
         }
 
         @Test
         fun `should return 400 when JSON format is invalid`() {
             mockMvc.perform(
                 post(BASE_URL)
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content("not-valid-json")
             )
                 .andExpect(status().isBadRequest)
-                .andExpect(jsonPath(JSON_PATH_ERROR).value("Invalid JSON format"))
+                .andExpect(jsonPath(JSON_PATH_ERROR).value(INVALID_JSON_MSG))
         }
 
         @Test
@@ -340,7 +347,7 @@ class CategoryTests {
 
             mockMvc.perform(
                 put("$BASE_URL/$categoryId")
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
@@ -360,7 +367,7 @@ class CategoryTests {
 
             mockMvc.perform(
                 put("$BASE_URL/$categoryId")
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
@@ -377,12 +384,12 @@ class CategoryTests {
 
             mockMvc.perform(
                 put("$BASE_URL/999")
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
                 .andExpect(status().isNotFound)
-                .andExpect(jsonPath(JSON_PATH_ERROR).value("Category not found with id: 999"))
+                .andExpect(jsonPath(JSON_PATH_ERROR).value("$CATEGORY_NOT_FOUND_MSG 999"))
         }
 
         @Test
@@ -396,7 +403,7 @@ class CategoryTests {
 
             mockMvc.perform(
                 put("$BASE_URL/$categoryId")
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
@@ -414,12 +421,12 @@ class CategoryTests {
 
             mockMvc.perform(
                 put("$BASE_URL/$categoryId")
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
                 .andExpect(status().isBadRequest)
-                .andExpect(jsonPath(JSON_PATH_ERRORS_NAME).value("Category name is required"))
+                .andExpect(jsonPath(JSON_PATH_ERRORS_NAME).value(CATEGORY_NAME_REQUIRED_MSG))
         }
 
         @Test
@@ -445,14 +452,14 @@ class CategoryTests {
 
             mockMvc.perform(
                 delete("$BASE_URL/$categoryId")
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
             )
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.message").value("Category deleted successfully"))
 
             mockMvc.perform(
                 get("$BASE_URL/$categoryId")
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
             )
                 .andExpect(status().isNotFound)
         }
@@ -461,10 +468,10 @@ class CategoryTests {
         fun `should return 404 when deleting non-existent category`() {
             mockMvc.perform(
                 delete("$BASE_URL/999")
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
             )
                 .andExpect(status().isNotFound)
-                .andExpect(jsonPath(JSON_PATH_ERROR).value("Category not found with id: 999"))
+                .andExpect(jsonPath(JSON_PATH_ERROR).value("$CATEGORY_NOT_FOUND_MSG 999"))
         }
 
         @Test
@@ -482,7 +489,7 @@ class CategoryTests {
 
         val result = mockMvc.perform(
             post(BASE_URL)
-                .header("Authorization", "Bearer $authToken")
+                .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
         ).andReturn()

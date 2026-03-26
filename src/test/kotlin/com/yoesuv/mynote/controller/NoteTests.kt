@@ -59,6 +59,13 @@ class NoteTests {
         private const val NOTE_WITH_CATEGORY = "Note with category"
         private const val CATEGORY_WORK = "Work"
         private const val COLOR_RED = "#FF0000"
+        private const val HEADER_AUTHORIZATION = "Authorization"
+        private const val BEARER_PREFIX = "Bearer "
+        private const val NOTE_NOT_FOUND_MSG = "Note not found with id:"
+        private const val CATEGORY_NOT_FOUND_MSG = "Category not found with id:"
+        private const val TITLE_REQUIRED_MSG = "Title is required"
+        private const val TITLE_LENGTH_MSG = "Title must be between 1 and 200 characters"
+        private const val INVALID_JSON_MSG = "Invalid JSON format"
     }
 
     @Autowired
@@ -113,7 +120,7 @@ class NoteTests {
         fun `should return empty list when no notes exist`() {
             mockMvc.perform(
                 get(BASE_URL)
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
             )
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$").isArray)
@@ -127,7 +134,7 @@ class NoteTests {
 
             mockMvc.perform(
                 get(BASE_URL)
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
             )
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$").isArray)
@@ -144,7 +151,7 @@ class NoteTests {
 
             mockMvc.perform(
                 get("$BASE_URL?categoryId=$categoryId")
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
             )
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$").isArray)
@@ -160,7 +167,7 @@ class NoteTests {
 
             mockMvc.perform(
                 get("$BASE_URL?categoryId=$categoryId")
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
             )
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$").isArray)
@@ -182,7 +189,7 @@ class NoteTests {
 
             mockMvc.perform(
                 get("$BASE_URL/$noteId")
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
             )
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.id").value(noteId))
@@ -198,7 +205,7 @@ class NoteTests {
 
             mockMvc.perform(
                 get("$BASE_URL/$noteId")
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
             )
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.id").value(noteId))
@@ -210,10 +217,10 @@ class NoteTests {
         fun `should return 404 when note not found`() {
             mockMvc.perform(
                 get("$BASE_URL/999")
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
             )
                 .andExpect(status().isNotFound)
-                .andExpect(jsonPath(JSON_PATH_ERROR).value("Note not found with id: 999"))
+                .andExpect(jsonPath(JSON_PATH_ERROR).value("$NOTE_NOT_FOUND_MSG 999"))
         }
 
         @Test
@@ -234,7 +241,7 @@ class NoteTests {
 
             mockMvc.perform(
                 post(BASE_URL)
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
@@ -258,7 +265,7 @@ class NoteTests {
 
             mockMvc.perform(
                 post(BASE_URL)
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
@@ -279,7 +286,7 @@ class NoteTests {
 
             mockMvc.perform(
                 post(BASE_URL)
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
@@ -295,7 +302,7 @@ class NoteTests {
 
             mockMvc.perform(
                 post(BASE_URL)
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
@@ -315,12 +322,12 @@ class NoteTests {
 
             mockMvc.perform(
                 post(BASE_URL)
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
                 .andExpect(status().isNotFound)
-                .andExpect(jsonPath(JSON_PATH_ERROR).value("Category not found with id: 999"))
+                .andExpect(jsonPath(JSON_PATH_ERROR).value("$CATEGORY_NOT_FOUND_MSG 999"))
         }
 
         @Test
@@ -332,12 +339,12 @@ class NoteTests {
 
             mockMvc.perform(
                 post(BASE_URL)
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
                 .andExpect(status().isBadRequest)
-                .andExpect(jsonPath(JSON_PATH_ERRORS_TITLE).value("Title is required"))
+                .andExpect(jsonPath(JSON_PATH_ERRORS_TITLE).value(TITLE_REQUIRED_MSG))
         }
 
         @Test
@@ -349,12 +356,12 @@ class NoteTests {
 
             mockMvc.perform(
                 post(BASE_URL)
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
                 .andExpect(status().isBadRequest)
-                .andExpect(jsonPath(JSON_PATH_ERRORS_TITLE).value("Title must be between 1 and 200 characters"))
+                .andExpect(jsonPath(JSON_PATH_ERRORS_TITLE).value(TITLE_LENGTH_MSG))
         }
 
         @Test
@@ -365,24 +372,24 @@ class NoteTests {
 
             mockMvc.perform(
                 post(BASE_URL)
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
                 .andExpect(status().isBadRequest)
-                .andExpect(jsonPath(JSON_PATH_ERRORS_TITLE).value("Title is required"))
+                .andExpect(jsonPath(JSON_PATH_ERRORS_TITLE).value(TITLE_REQUIRED_MSG))
         }
 
         @Test
         fun `should return 400 when JSON format is invalid`() {
             mockMvc.perform(
                 post(BASE_URL)
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content("not-valid-json")
             )
                 .andExpect(status().isBadRequest)
-                .andExpect(jsonPath(JSON_PATH_ERROR).value("Invalid JSON format"))
+                .andExpect(jsonPath(JSON_PATH_ERROR).value(INVALID_JSON_MSG))
         }
 
         @Test
@@ -414,7 +421,7 @@ class NoteTests {
 
             mockMvc.perform(
                 put("$BASE_URL/$noteId")
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
@@ -437,7 +444,7 @@ class NoteTests {
 
             mockMvc.perform(
                 put("$BASE_URL/$noteId")
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
@@ -457,7 +464,7 @@ class NoteTests {
 
             mockMvc.perform(
                 put("$BASE_URL/$noteId")
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
@@ -474,12 +481,12 @@ class NoteTests {
 
             mockMvc.perform(
                 put("$BASE_URL/999")
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
                 .andExpect(status().isNotFound)
-                .andExpect(jsonPath(JSON_PATH_ERROR).value("Note not found with id: 999"))
+                .andExpect(jsonPath(JSON_PATH_ERROR).value("$NOTE_NOT_FOUND_MSG 999"))
         }
 
         @Test
@@ -494,12 +501,12 @@ class NoteTests {
 
             mockMvc.perform(
                 put("$BASE_URL/$noteId")
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
                 .andExpect(status().isNotFound)
-                .andExpect(jsonPath(JSON_PATH_ERROR).value("Category not found with id: 999"))
+                .andExpect(jsonPath(JSON_PATH_ERROR).value("$CATEGORY_NOT_FOUND_MSG 999"))
         }
 
         @Test
@@ -512,12 +519,12 @@ class NoteTests {
 
             mockMvc.perform(
                 put("$BASE_URL/$noteId")
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             )
                 .andExpect(status().isBadRequest)
-                .andExpect(jsonPath(JSON_PATH_ERRORS_TITLE).value("Title is required"))
+                .andExpect(jsonPath(JSON_PATH_ERRORS_TITLE).value(TITLE_REQUIRED_MSG))
         }
 
         @Test
@@ -543,14 +550,14 @@ class NoteTests {
 
             mockMvc.perform(
                 delete("$BASE_URL/$noteId")
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
             )
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.message").value("Note deleted successfully"))
 
             mockMvc.perform(
                 get("$BASE_URL/$noteId")
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
             )
                 .andExpect(status().isNotFound)
         }
@@ -559,10 +566,10 @@ class NoteTests {
         fun `should return 404 when deleting non-existent note`() {
             mockMvc.perform(
                 delete("$BASE_URL/999")
-                    .header("Authorization", "Bearer $authToken")
+                    .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
             )
                 .andExpect(status().isNotFound)
-                .andExpect(jsonPath(JSON_PATH_ERROR).value("Note not found with id: 999"))
+                .andExpect(jsonPath(JSON_PATH_ERROR).value("$NOTE_NOT_FOUND_MSG 999"))
         }
 
         @Test
@@ -580,7 +587,7 @@ class NoteTests {
 
         val result = mockMvc.perform(
             post(CATEGORY_URL)
-                .header("Authorization", "Bearer $authToken")
+                .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
         ).andReturn()
@@ -597,7 +604,7 @@ class NoteTests {
 
         val result = mockMvc.perform(
             post(BASE_URL)
-                .header("Authorization", "Bearer $authToken")
+                .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
         ).andReturn()
@@ -615,7 +622,7 @@ class NoteTests {
 
         val result = mockMvc.perform(
             post(BASE_URL)
-                .header("Authorization", "Bearer $authToken")
+                .header(HEADER_AUTHORIZATION, "$BEARER_PREFIX$authToken")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
         ).andReturn()
