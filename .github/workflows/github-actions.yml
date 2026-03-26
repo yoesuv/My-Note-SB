@@ -54,6 +54,9 @@ jobs:
           done
           echo "PostgreSQL failed to start" && exit 1
 
+      - name: Create dbo schema
+        run: PGPASSWORD=password psql -h localhost -U postgres -d mynotes -c "CREATE SCHEMA IF NOT EXISTS dbo;"
+
       - name: Run tests with coverage
         run: ./gradlew test jacocoTestReport
         env:

@@ -1,6 +1,6 @@
-# My Note API
+# My Note API 
 
-[![Build Status](https://github.com/yoesuv/My-Note-SB/actions/workflows/github-action.yml/badge.svg)](https://github.com/yoesuv/My-Note-SB/actions)
+[![Build Status](https://github.com/yoesuv/My-Note-SB/actions/workflows/github-actions.yml/badge.svg)](https://github.com/yoesuv/My-Note-SB/actions)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/05da8d3007824831b3cc199fdef71f6c)](https://app.codacy.com/gh/yoesuv/My-Note-SB)
 [![Codacy Badge](https://app.codacy.com/project/badge/Coverage/05da8d3007824831b3cc199fdef71f6c)](https://app.codacy.com/gh/yoesuv/My-Note-SB)
 
