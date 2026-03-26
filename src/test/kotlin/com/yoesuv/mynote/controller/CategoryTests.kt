@@ -39,6 +39,11 @@ class CategoryTests {
         private const val JSON_PATH_ERROR = "$.error"
         private const val JSON_PATH_ERRORS_NAME = "$.errors.name"
         private const val JSON_PATH_ERRORS_COLOR = "$.errors.color"
+        private const val CATEGORY_WORK = "Work"
+        private const val CATEGORY_PERSONAL = "Personal"
+        private const val COLOR_RED = "#FF0000"
+        private const val COLOR_GREEN = "#00FF00"
+        private const val CATEGORY_WORK_UPDATED = "Work Updated"
     }
 
     @Autowired
@@ -97,8 +102,8 @@ class CategoryTests {
 
         @Test
         fun `should return list of categories`() {
-            createCategory("Work", "#FF0000")
-            createCategory("Personal", "#00FF00")
+            createCategory(CATEGORY_WORK, COLOR_RED)
+            createCategory(CATEGORY_PERSONAL, COLOR_GREEN)
 
             mockMvc.perform(
                 get(BASE_URL)
@@ -107,8 +112,8 @@ class CategoryTests {
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$").isArray)
                 .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].name").value("Work"))
-                .andExpect(jsonPath("$[1].name").value("Personal"))
+                .andExpect(jsonPath("$[0].name").value(CATEGORY_WORK))
+                .andExpect(jsonPath("$[1].name").value(CATEGORY_PERSONAL))
         }
 
         @Test
@@ -122,7 +127,7 @@ class CategoryTests {
     inner class GetCategoryById {
         @Test
         fun `should return category by id`() {
-            val categoryId = createCategory("Work", "#FF0000")
+            val categoryId = createCategory(CATEGORY_WORK, COLOR_RED)
 
             mockMvc.perform(
                 get("$BASE_URL/$categoryId")
@@ -130,8 +135,8 @@ class CategoryTests {
             )
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.id").value(categoryId))
-                .andExpect(jsonPath("$.name").value("Work"))
-                .andExpect(jsonPath("$.color").value("#FF0000"))
+                .andExpect(jsonPath("$.name").value(CATEGORY_WORK))
+                .andExpect(jsonPath("$.color").value(COLOR_RED))
         }
 
         @Test
@@ -156,8 +161,8 @@ class CategoryTests {
         @Test
         fun `should create category successfully`() {
             val request = mapOf(
-                KEY_NAME to "Work",
-                KEY_COLOR to "#FF0000"
+                KEY_NAME to CATEGORY_WORK,
+                KEY_COLOR to COLOR_RED
             )
 
             mockMvc.perform(
@@ -168,15 +173,15 @@ class CategoryTests {
             )
                 .andExpect(status().isCreated)
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.name").value("Work"))
-                .andExpect(jsonPath("$.color").value("#FF0000"))
+                .andExpect(jsonPath("$.name").value(CATEGORY_WORK))
+                .andExpect(jsonPath("$.color").value(COLOR_RED))
                 .andExpect(jsonPath("$.userId").exists())
         }
 
         @Test
         fun `should create category without color`() {
             val request = mapOf(
-                KEY_NAME to "Personal"
+                KEY_NAME to CATEGORY_PERSONAL
             )
 
             mockMvc.perform(
@@ -187,17 +192,17 @@ class CategoryTests {
             )
                 .andExpect(status().isCreated)
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.name").value("Personal"))
+                .andExpect(jsonPath("$.name").value(CATEGORY_PERSONAL))
                 .andExpect(jsonPath("$.color").doesNotExist())
         }
 
         @Test
         fun `should return 409 when category name already exists`() {
-            createCategory("Work", "#FF0000")
+            createCategory(CATEGORY_WORK, COLOR_RED)
 
             val request = mapOf(
-                KEY_NAME to "Work",
-                KEY_COLOR to "#00FF00"
+                KEY_NAME to CATEGORY_WORK,
+                KEY_COLOR to COLOR_GREEN
             )
 
             mockMvc.perform(
@@ -207,14 +212,14 @@ class CategoryTests {
                     .content(objectMapper.writeValueAsString(request))
             )
                 .andExpect(status().isConflict)
-                .andExpect(jsonPath(JSON_PATH_ERROR).value("Category already exists with name: Work"))
+                .andExpect(jsonPath(JSON_PATH_ERROR).value("Category already exists with name: $CATEGORY_WORK"))
         }
 
         @Test
         fun `should return 400 when name is empty`() {
             val request = mapOf(
                 KEY_NAME to "",
-                KEY_COLOR to "#FF0000"
+                KEY_COLOR to COLOR_RED
             )
 
             mockMvc.perform(
@@ -231,7 +236,7 @@ class CategoryTests {
         fun `should return 400 when name is too short`() {
             val request = mapOf(
                 KEY_NAME to "A",
-                KEY_COLOR to "#FF0000"
+                KEY_COLOR to COLOR_RED
             )
 
             mockMvc.perform(
@@ -248,7 +253,7 @@ class CategoryTests {
         fun `should return 400 when name is too long`() {
             val request = mapOf(
                 KEY_NAME to "A".repeat(101),
-                KEY_COLOR to "#FF0000"
+                KEY_COLOR to COLOR_RED
             )
 
             mockMvc.perform(
@@ -264,7 +269,7 @@ class CategoryTests {
         @Test
         fun `should return 400 when color is too long`() {
             val request = mapOf(
-                KEY_NAME to "Work",
+                KEY_NAME to CATEGORY_WORK,
                 KEY_COLOR to "A".repeat(21)
             )
 
@@ -281,7 +286,7 @@ class CategoryTests {
         @Test
         fun `should return 400 when name is missing`() {
             val request = mapOf(
-                KEY_COLOR to "#FF0000"
+                KEY_COLOR to COLOR_RED
             )
 
             mockMvc.perform(
@@ -309,8 +314,8 @@ class CategoryTests {
         @Test
         fun `should return 401 when not authenticated`() {
             val request = mapOf(
-                KEY_NAME to "Work",
-                KEY_COLOR to "#FF0000"
+                KEY_NAME to CATEGORY_WORK,
+                KEY_COLOR to COLOR_RED
             )
 
             mockMvc.perform(
@@ -326,11 +331,11 @@ class CategoryTests {
     inner class UpdateCategory {
         @Test
         fun `should update category successfully`() {
-            val categoryId = createCategory("Work", "#FF0000")
+            val categoryId = createCategory(CATEGORY_WORK, COLOR_RED)
 
             val request = mapOf(
-                KEY_NAME to "Work Updated",
-                KEY_COLOR to "#00FF00"
+                KEY_NAME to CATEGORY_WORK_UPDATED,
+                KEY_COLOR to COLOR_GREEN
             )
 
             mockMvc.perform(
@@ -341,16 +346,16 @@ class CategoryTests {
             )
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.id").value(categoryId))
-                .andExpect(jsonPath("$.name").value("Work Updated"))
-                .andExpect(jsonPath("$.color").value("#00FF00"))
+                .andExpect(jsonPath("$.name").value(CATEGORY_WORK_UPDATED))
+                .andExpect(jsonPath("$.color").value(COLOR_GREEN))
         }
 
         @Test
         fun `should update category without changing color`() {
-            val categoryId = createCategory("Work", "#FF0000")
+            val categoryId = createCategory(CATEGORY_WORK, COLOR_RED)
 
             val request = mapOf(
-                KEY_NAME to "Work Updated"
+                KEY_NAME to CATEGORY_WORK_UPDATED
             )
 
             mockMvc.perform(
@@ -360,14 +365,14 @@ class CategoryTests {
                     .content(objectMapper.writeValueAsString(request))
             )
                 .andExpect(status().isOk)
-                .andExpect(jsonPath("$.name").value("Work Updated"))
+                .andExpect(jsonPath("$.name").value(CATEGORY_WORK_UPDATED))
         }
 
         @Test
         fun `should return 404 when updating non-existent category`() {
             val request = mapOf(
-                KEY_NAME to "Work Updated",
-                KEY_COLOR to "#00FF00"
+                KEY_NAME to CATEGORY_WORK_UPDATED,
+                KEY_COLOR to COLOR_GREEN
             )
 
             mockMvc.perform(
@@ -382,11 +387,11 @@ class CategoryTests {
 
         @Test
         fun `should return 409 when updating to existing category name`() {
-            createCategory("Personal", "#00FF00")
-            val categoryId = createCategory("Work", "#FF0000")
+            createCategory(CATEGORY_PERSONAL, COLOR_GREEN)
+            val categoryId = createCategory(CATEGORY_WORK, COLOR_RED)
 
             val request = mapOf(
-                KEY_NAME to "Personal"
+                KEY_NAME to CATEGORY_PERSONAL
             )
 
             mockMvc.perform(
@@ -396,12 +401,12 @@ class CategoryTests {
                     .content(objectMapper.writeValueAsString(request))
             )
                 .andExpect(status().isConflict)
-                .andExpect(jsonPath(JSON_PATH_ERROR).value("Category already exists with name: Personal"))
+                .andExpect(jsonPath(JSON_PATH_ERROR).value("Category already exists with name: $CATEGORY_PERSONAL"))
         }
 
         @Test
         fun `should return 400 when name is empty on update`() {
-            val categoryId = createCategory("Work", "#FF0000")
+            val categoryId = createCategory(CATEGORY_WORK, COLOR_RED)
 
             val request = mapOf(
                 KEY_NAME to ""
@@ -420,7 +425,7 @@ class CategoryTests {
         @Test
         fun `should return 401 when not authenticated`() {
             val request = mapOf(
-                KEY_NAME to "Work Updated"
+                KEY_NAME to CATEGORY_WORK_UPDATED
             )
 
             mockMvc.perform(
@@ -436,7 +441,7 @@ class CategoryTests {
     inner class DeleteCategory {
         @Test
         fun `should delete category successfully`() {
-            val categoryId = createCategory("Work", "#FF0000")
+            val categoryId = createCategory(CATEGORY_WORK, COLOR_RED)
 
             mockMvc.perform(
                 delete("$BASE_URL/$categoryId")
