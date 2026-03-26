@@ -44,6 +44,21 @@ class NoteTests {
         private const val KEY_FULL_NAME = "fullName"
         private const val JSON_PATH_ERROR = "$.error"
         private const val JSON_PATH_ERRORS_TITLE = "$.errors.title"
+        private const val NOTE_TEST_TITLE = "Test Note"
+        private const val NOTE_TEST_CONTENT = "Test Content"
+        private const val NOTE_1_TITLE = "Note 1"
+        private const val NOTE_2_TITLE = "Note 2"
+        private const val NOTE_1_CONTENT = "Content 1"
+        private const val NOTE_2_CONTENT = "Content 2"
+        private const val NOTE_UPDATED_TITLE = "Updated Title"
+        private const val NOTE_UPDATED_CONTENT = "Updated Content"
+        private const val NOTE_ORIGINAL_TITLE = "Original Title"
+        private const val NOTE_ORIGINAL_CONTENT = "Original Content"
+        private const val NOTE_PINNED_TITLE = "Pinned Note"
+        private const val NOTE_WITHOUT_CATEGORY = "Note without category"
+        private const val NOTE_WITH_CATEGORY = "Note with category"
+        private const val CATEGORY_WORK = "Work"
+        private const val COLOR_RED = "#FF0000"
     }
 
     @Autowired
@@ -107,8 +122,8 @@ class NoteTests {
 
         @Test
         fun `should return list of notes`() {
-            createNote("Note 1", "Content 1")
-            createNote("Note 2", "Content 2")
+            createNote(NOTE_1_TITLE, NOTE_1_CONTENT)
+            createNote(NOTE_2_TITLE, NOTE_2_CONTENT)
 
             mockMvc.perform(
                 get(BASE_URL)
@@ -117,15 +132,15 @@ class NoteTests {
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$").isArray)
                 .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].title").value("Note 1"))
-                .andExpect(jsonPath("$[1].title").value("Note 2"))
+                .andExpect(jsonPath("$[0].title").value(NOTE_1_TITLE))
+                .andExpect(jsonPath("$[1].title").value(NOTE_2_TITLE))
         }
 
         @Test
         fun `should filter notes by categoryId`() {
-            val categoryId = createCategory("Work", "#FF0000")
-            createNote("Note without category", "Content 1")
-            createNoteWithCategory("Note with category", "Content 2", categoryId)
+            val categoryId = createCategory(CATEGORY_WORK, COLOR_RED)
+            createNote(NOTE_WITHOUT_CATEGORY, NOTE_1_CONTENT)
+            createNoteWithCategory(NOTE_WITH_CATEGORY, NOTE_2_CONTENT, categoryId)
 
             mockMvc.perform(
                 get("$BASE_URL?categoryId=$categoryId")
@@ -134,14 +149,14 @@ class NoteTests {
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$").isArray)
                 .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].title").value("Note with category"))
+                .andExpect(jsonPath("$[0].title").value(NOTE_WITH_CATEGORY))
                 .andExpect(jsonPath("$[0].category.id").value(categoryId))
         }
 
         @Test
         fun `should return empty list when category filter has no notes`() {
-            val categoryId = createCategory("Work", "#FF0000")
-            createNote("Note without category", "Content 1")
+            val categoryId = createCategory(CATEGORY_WORK, COLOR_RED)
+            createNote(NOTE_WITHOUT_CATEGORY, NOTE_1_CONTENT)
 
             mockMvc.perform(
                 get("$BASE_URL?categoryId=$categoryId")
@@ -163,7 +178,7 @@ class NoteTests {
     inner class GetNoteById {
         @Test
         fun `should return note by id`() {
-            val noteId = createNote("Test Note", "Test Content")
+            val noteId = createNote(NOTE_TEST_TITLE, NOTE_TEST_CONTENT)
 
             mockMvc.perform(
                 get("$BASE_URL/$noteId")
@@ -171,15 +186,15 @@ class NoteTests {
             )
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.id").value(noteId))
-                .andExpect(jsonPath("$.title").value("Test Note"))
-                .andExpect(jsonPath("$.content").value("Test Content"))
+                .andExpect(jsonPath("$.title").value(NOTE_TEST_TITLE))
+                .andExpect(jsonPath("$.content").value(NOTE_TEST_CONTENT))
                 .andExpect(jsonPath("$.isPinned").value(false))
         }
 
         @Test
         fun `should return note with category`() {
-            val categoryId = createCategory("Work", "#FF0000")
-            val noteId = createNoteWithCategory("Test Note", "Test Content", categoryId)
+            val categoryId = createCategory(CATEGORY_WORK, COLOR_RED)
+            val noteId = createNoteWithCategory(NOTE_TEST_TITLE, NOTE_TEST_CONTENT, categoryId)
 
             mockMvc.perform(
                 get("$BASE_URL/$noteId")
@@ -188,7 +203,7 @@ class NoteTests {
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.id").value(noteId))
                 .andExpect(jsonPath("$.category.id").value(categoryId))
-                .andExpect(jsonPath("$.category.name").value("Work"))
+                .andExpect(jsonPath("$.category.name").value(CATEGORY_WORK))
         }
 
         @Test
@@ -213,8 +228,8 @@ class NoteTests {
         @Test
         fun `should create note successfully`() {
             val request = mapOf(
-                KEY_TITLE to "Test Note",
-                KEY_CONTENT to "Test Content"
+                KEY_TITLE to NOTE_TEST_TITLE,
+                KEY_CONTENT to NOTE_TEST_CONTENT
             )
 
             mockMvc.perform(
@@ -225,19 +240,19 @@ class NoteTests {
             )
                 .andExpect(status().isCreated)
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.title").value("Test Note"))
-                .andExpect(jsonPath("$.content").value("Test Content"))
+                .andExpect(jsonPath("$.title").value(NOTE_TEST_TITLE))
+                .andExpect(jsonPath("$.content").value(NOTE_TEST_CONTENT))
                 .andExpect(jsonPath("$.isPinned").value(false))
                 .andExpect(jsonPath("$.userId").exists())
         }
 
         @Test
         fun `should create note with category`() {
-            val categoryId = createCategory("Work", "#FF0000")
+            val categoryId = createCategory(CATEGORY_WORK, COLOR_RED)
 
             val request = mapOf(
-                KEY_TITLE to "Test Note",
-                KEY_CONTENT to "Test Content",
+                KEY_TITLE to NOTE_TEST_TITLE,
+                KEY_CONTENT to NOTE_TEST_CONTENT,
                 KEY_CATEGORY_ID to categoryId
             )
 
@@ -249,16 +264,16 @@ class NoteTests {
             )
                 .andExpect(status().isCreated)
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.title").value("Test Note"))
+                .andExpect(jsonPath("$.title").value(NOTE_TEST_TITLE))
                 .andExpect(jsonPath("$.category.id").value(categoryId))
-                .andExpect(jsonPath("$.category.name").value("Work"))
+                .andExpect(jsonPath("$.category.name").value(CATEGORY_WORK))
         }
 
         @Test
         fun `should create note with isPinned true`() {
             val request = mapOf(
-                KEY_TITLE to "Pinned Note",
-                KEY_CONTENT to "Test Content",
+                KEY_TITLE to NOTE_PINNED_TITLE,
+                KEY_CONTENT to NOTE_TEST_CONTENT,
                 KEY_IS_PINNED to true
             )
 
@@ -275,7 +290,7 @@ class NoteTests {
         @Test
         fun `should create note without content`() {
             val request = mapOf(
-                KEY_TITLE to "Test Note"
+                KEY_TITLE to NOTE_TEST_TITLE
             )
 
             mockMvc.perform(
@@ -286,15 +301,15 @@ class NoteTests {
             )
                 .andExpect(status().isCreated)
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.title").value("Test Note"))
+                .andExpect(jsonPath("$.title").value(NOTE_TEST_TITLE))
                 .andExpect(jsonPath("$.content").doesNotExist())
         }
 
         @Test
         fun `should return 404 when category not found`() {
             val request = mapOf(
-                KEY_TITLE to "Test Note",
-                KEY_CONTENT to "Test Content",
+                KEY_TITLE to NOTE_TEST_TITLE,
+                KEY_CONTENT to NOTE_TEST_CONTENT,
                 KEY_CATEGORY_ID to 999
             )
 
@@ -312,7 +327,7 @@ class NoteTests {
         fun `should return 400 when title is empty`() {
             val request = mapOf(
                 KEY_TITLE to "",
-                KEY_CONTENT to "Test Content"
+                KEY_CONTENT to NOTE_TEST_CONTENT
             )
 
             mockMvc.perform(
@@ -329,7 +344,7 @@ class NoteTests {
         fun `should return 400 when title exceeds max length`() {
             val request = mapOf(
                 KEY_TITLE to "A".repeat(201),
-                KEY_CONTENT to "Test Content"
+                KEY_CONTENT to NOTE_TEST_CONTENT
             )
 
             mockMvc.perform(
@@ -345,7 +360,7 @@ class NoteTests {
         @Test
         fun `should return 400 when title is missing`() {
             val request = mapOf(
-                KEY_CONTENT to "Test Content"
+                KEY_CONTENT to NOTE_TEST_CONTENT
             )
 
             mockMvc.perform(
@@ -373,8 +388,8 @@ class NoteTests {
         @Test
         fun `should return 401 when not authenticated`() {
             val request = mapOf(
-                KEY_TITLE to "Test Note",
-                KEY_CONTENT to "Test Content"
+                KEY_TITLE to NOTE_TEST_TITLE,
+                KEY_CONTENT to NOTE_TEST_CONTENT
             )
 
             mockMvc.perform(
@@ -390,11 +405,11 @@ class NoteTests {
     inner class UpdateNote {
         @Test
         fun `should update note successfully`() {
-            val noteId = createNote("Original Title", "Original Content")
+            val noteId = createNote(NOTE_ORIGINAL_TITLE, NOTE_ORIGINAL_CONTENT)
 
             val request = mapOf(
-                KEY_TITLE to "Updated Title",
-                KEY_CONTENT to "Updated Content"
+                KEY_TITLE to NOTE_UPDATED_TITLE,
+                KEY_CONTENT to NOTE_UPDATED_CONTENT
             )
 
             mockMvc.perform(
@@ -405,18 +420,18 @@ class NoteTests {
             )
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.id").value(noteId))
-                .andExpect(jsonPath("$.title").value("Updated Title"))
-                .andExpect(jsonPath("$.content").value("Updated Content"))
+                .andExpect(jsonPath("$.title").value(NOTE_UPDATED_TITLE))
+                .andExpect(jsonPath("$.content").value(NOTE_UPDATED_CONTENT))
         }
 
         @Test
         fun `should update note with category`() {
-            val categoryId = createCategory("Work", "#FF0000")
-            val noteId = createNote("Original Title", "Original Content")
+            val categoryId = createCategory(CATEGORY_WORK, COLOR_RED)
+            val noteId = createNote(NOTE_ORIGINAL_TITLE, NOTE_ORIGINAL_CONTENT)
 
             val request = mapOf(
-                KEY_TITLE to "Updated Title",
-                KEY_CONTENT to "Updated Content",
+                KEY_TITLE to NOTE_UPDATED_TITLE,
+                KEY_CONTENT to NOTE_UPDATED_CONTENT,
                 KEY_CATEGORY_ID to categoryId
             )
 
@@ -432,11 +447,11 @@ class NoteTests {
 
         @Test
         fun `should update isPinned`() {
-            val noteId = createNote("Test Note", "Test Content")
+            val noteId = createNote(NOTE_TEST_TITLE, NOTE_TEST_CONTENT)
 
             val request = mapOf(
-                KEY_TITLE to "Test Note",
-                KEY_CONTENT to "Test Content",
+                KEY_TITLE to NOTE_TEST_TITLE,
+                KEY_CONTENT to NOTE_TEST_CONTENT,
                 KEY_IS_PINNED to true
             )
 
@@ -453,8 +468,8 @@ class NoteTests {
         @Test
         fun `should return 404 when updating non-existent note`() {
             val request = mapOf(
-                KEY_TITLE to "Updated Title",
-                KEY_CONTENT to "Updated Content"
+                KEY_TITLE to NOTE_UPDATED_TITLE,
+                KEY_CONTENT to NOTE_UPDATED_CONTENT
             )
 
             mockMvc.perform(
@@ -469,11 +484,11 @@ class NoteTests {
 
         @Test
         fun `should return 404 when category not found on update`() {
-            val noteId = createNote("Test Note", "Test Content")
+            val noteId = createNote(NOTE_TEST_TITLE, NOTE_TEST_CONTENT)
 
             val request = mapOf(
-                KEY_TITLE to "Updated Title",
-                KEY_CONTENT to "Updated Content",
+                KEY_TITLE to NOTE_UPDATED_TITLE,
+                KEY_CONTENT to NOTE_UPDATED_CONTENT,
                 KEY_CATEGORY_ID to 999
             )
 
@@ -489,7 +504,7 @@ class NoteTests {
 
         @Test
         fun `should return 400 when title is empty on update`() {
-            val noteId = createNote("Test Note", "Test Content")
+            val noteId = createNote(NOTE_TEST_TITLE, NOTE_TEST_CONTENT)
 
             val request = mapOf(
                 KEY_TITLE to ""
@@ -508,7 +523,7 @@ class NoteTests {
         @Test
         fun `should return 401 when not authenticated`() {
             val request = mapOf(
-                KEY_TITLE to "Updated Title"
+                KEY_TITLE to NOTE_UPDATED_TITLE
             )
 
             mockMvc.perform(
@@ -524,7 +539,7 @@ class NoteTests {
     inner class DeleteNote {
         @Test
         fun `should delete note successfully`() {
-            val noteId = createNote("Test Note", "Test Content")
+            val noteId = createNote(NOTE_TEST_TITLE, NOTE_TEST_CONTENT)
 
             mockMvc.perform(
                 delete("$BASE_URL/$noteId")
