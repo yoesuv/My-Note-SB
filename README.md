@@ -110,79 +110,19 @@ The API will be available at `http://localhost:8080`
 
 ## API Documentation
 
-### Authentication Endpoints
+**Base URL:** `http://localhost:8080/api`
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/auth/register` | Register a new user |
-| POST | `/api/auth/login` | Login and get JWT token |
-| POST | `/api/auth/logout` | Logout (client-side token removal) |
+| Resource | Endpoints |
+|----------|-----------|
+| Auth | `POST /auth/register`, `POST /auth/login` |
+| Notes | `GET/POST /notes`, `GET/PUT/DELETE /notes/{id}` |
+| Categories | `GET/POST /categories`, `GET/PUT/DELETE /categories/{id}` |
 
-### Notes Endpoints
+> All endpoints except `/auth/**` require `Authorization: Bearer <token>` header.
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/notes` | Get all notes (optionally filter by `?categoryId={id}`) |
-| GET | `/api/notes/{id}` | Get a specific note |
-| POST | `/api/notes` | Create a new note |
-| PUT | `/api/notes/{id}` | Update an existing note |
-| DELETE | `/api/notes/{id}` | Delete a note |
-
-### Categories Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/categories` | Get all categories |
-| GET | `/api/categories/{id}` | Get a specific category |
-| POST | `/api/categories` | Create a new category |
-| PUT | `/api/categories/{id}` | Update a category |
-| DELETE | `/api/categories/{id}` | Delete a category |
-
-### Authentication Header
-
-All endpoints except `/api/auth/**` require a valid JWT token:
-
-```
-Authorization: Bearer <your-jwt-token>
-```
-
-### Example Requests
-
-**Register:**
-```bash
-curl -X POST http://localhost:8080/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "username": "johndoe",
-    "email": "john@example.com",
-    "password": "password123"
-  }'
-```
-
-**Login:**
-```bash
-curl -X POST http://localhost:8080/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "username": "johndoe",
-    "password": "password123"
-  }'
-```
-
-**Create a Note:**
-```bash
-curl -X POST http://localhost:8080/api/notes \
-  -H "Authorization: Bearer <token>" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "My First Note",
-    "content": "This is the content of my note",
-    "isPinned": true
-  }'
-```
-
-For complete API documentation, see the `/docs` directory:
-- [Authentication API](docs/login.md)
+For full documentation with request/response examples and error codes, see:
+- [Register API](docs/register.md)
+- [Login API](docs/login.md)
 - [Notes API](docs/note.md)
 - [Categories API](docs/category.md)
 
