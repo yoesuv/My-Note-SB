@@ -50,6 +50,32 @@ my-note/
 └── docs/                # API documentation
 ```
 
+## System Flow
+
+```mermaid
+flowchart TD
+    user["User"] --> app["Client app or API tool"]
+    app --> auth{"Has an account?"}
+
+    auth -->|"No"| register["Register"]
+    auth -->|"Yes"| login["Login"]
+
+    register --> token["Receive access token"]
+    login --> token
+
+    token --> actions["Use My Note API"]
+
+    actions --> notes["Create, view, update, and delete notes"]
+    actions --> categories["Create, view, update, and delete categories"]
+    actions --> logout["Logout"]
+
+    notes --> database["PostgreSQL database"]
+    categories --> database
+    logout --> finished["Session finished on client"]
+
+    database --> saved["User data is stored separately and securely"]
+```
+
 ## Getting Started
 
 ### Prerequisites
@@ -114,7 +140,7 @@ The API will be available at `http://localhost:8080`
 
 | Resource | Endpoints |
 |----------|-----------|
-| Auth | `POST /auth/register`, `POST /auth/login` |
+| Auth | `POST /auth/register`, `POST /auth/login`, `POST /auth/logout` |
 | Notes | `GET/POST /notes`, `GET/PUT/DELETE /notes/{id}` |
 | Categories | `GET/POST /categories`, `GET/PUT/DELETE /categories/{id}` |
 
