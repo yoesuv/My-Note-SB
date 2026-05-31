@@ -38,7 +38,7 @@ class CategoryService(
         val name = request.name!!.trim()
         val color = request.color?.trim()
 
-        if (categoryRepository.existsByUserIdAndName(user.id!!, name)) {
+        if (categoryRepository.existsByUserIdAndNormalizedName(user.id!!, name)) {
             throw CategoryAlreadyExistsException(name)
         }
 
@@ -62,7 +62,7 @@ class CategoryService(
         val newName = request.name!!.trim()
         val newColor = request.color?.trim()
 
-        if (categoryRepository.existsByUserIdAndNameAndIdNot(userId, newName, id)) {
+        if (categoryRepository.existsByUserIdAndNormalizedNameAndIdNot(userId, newName, id)) {
             throw CategoryAlreadyExistsException(newName)
         }
 

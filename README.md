@@ -23,6 +23,7 @@ A **Spring Boot** RESTful API for a personal note-taking application with JWT au
   - Organize notes with custom categories
   - Color-coded categories for visual organization
   - CRUD operations for category management
+  - Category names are trimmed and unique per user, case-insensitively (`Work` and `work` are considered duplicates)
 
 - **Security**
   - Spring Security with JWT tokens
@@ -50,13 +51,40 @@ my-note/
 └── docs/                # API documentation
 ```
 
+## System Flow
+
+```mermaid
+flowchart TD
+    user["User"] --> app["Client app or API tool"]
+    app --> auth{"Has an account?"}
+
+    auth -->|"No"| register["Register"]
+    auth -->|"Yes"| login["Login"]
+
+    register --> token["Receive access token"]
+    login --> token
+
+    token --> actions["Use My Note API"]
+
+    actions --> notes["Create, view, update, and delete notes"]
+    actions --> categories["Create, view, update, and delete categories"]
+    categories --> categoryRules["Validate category name: trim spaces and reject case-insensitive duplicates per user"]
+    actions --> logout["Logout"]
+
+    notes --> database["PostgreSQL database"]
+    categoryRules --> database
+    logout --> finished["Session finished on client"]
+
+    database --> saved["User data is stored separately and securely"]
+```
+
 ## Getting Started
 
 ### Prerequisites
 
 - Java 17 or higher
 - PostgreSQL 12+
-- Gradle (or use the included wrapper)
+- Gradle is optional because this project includes the Gradle wrapper (`./gradlew`)
 
 ### Setup
 
@@ -67,39 +95,55 @@ my-note/
    ```
 
 2. **Create database**
-   
-   Create a PostgreSQL database (tables will be auto-created on first run):
+    
+   Create a PostgreSQL database. Flyway will create the schema and tables when the application starts.
    ```sql
    CREATE DATABASE mynotes;
    ```
-   
+    
    Or using psql:
    ```bash
-   psql -U postgres -c "CREATE DATABASE mynotes;"
+   psql -U your_username -c "CREATE DATABASE mynotes;"
    ```
 
 3. **Configure database connection**
-   
-   Update `src/main/resources/application.properties`:
+    
+   Create a local configuration file named `local.properties` in the project root. This file is ignored by Git and is automatically imported by the application.
    ```properties
-   spring.datasource.url=jdbc:postgresql://localhost:5432/mynotes
-   spring.datasource.username=your_username
-   spring.datasource.password=your_password
+   DB_URL=jdbc:postgresql://localhost:5432/mynotes
+   DB_USERNAME=your_username
+   DB_PASSWORD=your_password
+   ```
+
+   If your PostgreSQL user does not use a password, leave it empty:
+   ```properties
+   DB_PASSWORD=
    ```
 
 4. **Configure JWT** (optional)
-   
-   Update JWT settings in `application.properties`:
+    
+   Add JWT settings to `local.properties` if you want to override the defaults:
    ```properties
-   jwt.secret=your-256-bit-secret-key-here-minimum-32-characters
-   jwt.expiration=86400000
+   JWT_SECRET=your-256-bit-secret-key-here-minimum-32-characters
    ```
 
 5. **Run the application**
    ```bash
    ./gradlew bootRun
    ```
-   
+
+   To run with development seed data, use the `dev` profile:
+   ```bash
+   ./gradlew bootRun --args='--spring.profiles.active=dev'
+   ```
+
+   The `dev` profile seeds demo users, categories, and notes if they do not already exist:
+
+   | Email | Password |
+   |-------|----------|
+   | `demo@mynotes.com` | `password` |
+   | `john@example.com` | `password` |
+     
    Or build and run the JAR:
    ```bash
    ./gradlew build
@@ -110,79 +154,19 @@ The API will be available at `http://localhost:8080`
 
 ## API Documentation
 
-### Authentication Endpoints
+**Base URL:** `http://localhost:8080/api`
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/auth/register` | Register a new user |
-| POST | `/api/auth/login` | Login and get JWT token |
-| POST | `/api/auth/logout` | Logout (client-side token removal) |
+| Resource | Endpoints |
+|----------|-----------|
+| Auth | `POST /auth/register`, `POST /auth/login`, `POST /auth/logout` |
+| Notes | `GET/POST /notes`, `GET/PUT/DELETE /notes/{id}` |
+| Categories | `GET/POST /categories`, `GET/PUT/DELETE /categories/{id}` |
 
-### Notes Endpoints
+> All endpoints except `/auth/**` require `Authorization: Bearer <token>` header.
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/notes` | Get all notes (optionally filter by `?categoryId={id}`) |
-| GET | `/api/notes/{id}` | Get a specific note |
-| POST | `/api/notes` | Create a new note |
-| PUT | `/api/notes/{id}` | Update an existing note |
-| DELETE | `/api/notes/{id}` | Delete a note |
-
-### Categories Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/categories` | Get all categories |
-| GET | `/api/categories/{id}` | Get a specific category |
-| POST | `/api/categories` | Create a new category |
-| PUT | `/api/categories/{id}` | Update a category |
-| DELETE | `/api/categories/{id}` | Delete a category |
-
-### Authentication Header
-
-All endpoints except `/api/auth/**` require a valid JWT token:
-
-```
-Authorization: Bearer <your-jwt-token>
-```
-
-### Example Requests
-
-**Register:**
-```bash
-curl -X POST http://localhost:8080/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "username": "johndoe",
-    "email": "john@example.com",
-    "password": "password123"
-  }'
-```
-
-**Login:**
-```bash
-curl -X POST http://localhost:8080/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "username": "johndoe",
-    "password": "password123"
-  }'
-```
-
-**Create a Note:**
-```bash
-curl -X POST http://localhost:8080/api/notes \
-  -H "Authorization: Bearer <token>" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "My First Note",
-    "content": "This is the content of my note",
-    "isPinned": true
-  }'
-```
-
-For complete API documentation, see the `/docs` directory:
-- [Authentication API](docs/login.md)
+For full documentation with request/response examples and error codes, see:
+- [Register API](docs/register.md)
+- [Login API](docs/login.md)
 - [Notes API](docs/note.md)
 - [Categories API](docs/category.md)
 
