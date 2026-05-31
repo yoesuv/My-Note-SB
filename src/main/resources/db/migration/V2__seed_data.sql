@@ -1,0 +1,8 @@
+-- noqa: disable=all
+-- tsqllint-disable
+-- This is a PostgreSQL Flyway migration. SQL Server SET directives such as
+-- ANSI_NULLS, NOCOUNT, QUOTED_IDENTIFIER, and READ UNCOMMITTED are intentionally
+-- not used because they are not valid PostgreSQL syntax.
+-- Seed data is handled by DemoDataSeeder when the dev profile is active.
+-- This Flyway version is intentionally kept as a no-op so existing migration
+-- ordering remains stable without shipping demo credentials in SQL migrations.

@@ -233,6 +233,43 @@ class CategoryTests {
         }
 
         @Test
+        fun `should return 409 when category name already exists with different case`() {
+            createCategory(CATEGORY_WORK, COLOR_RED)
+
+            val request = mapOf(
+                KEY_NAME to CATEGORY_WORK.lowercase(),
+                KEY_COLOR to COLOR_GREEN
+            )
+
+            mockMvc.perform(
+                post(BASE_URL)
+                    .header(HEADER_AUTHORIZATION, BEARER_PREFIX + authToken)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request))
+            )
+                .andExpect(status().isConflict)
+                .andExpect(jsonPath(JSON_PATH_ERROR).value(CATEGORY_EXISTS_MSG + " " + CATEGORY_WORK.lowercase()))
+        }
+
+        @Test
+        fun `should trim category name and color when creating`() {
+            val request = mapOf(
+                KEY_NAME to "  $CATEGORY_WORK  ",
+                KEY_COLOR to "  $COLOR_RED  "
+            )
+
+            mockMvc.perform(
+                post(BASE_URL)
+                    .header(HEADER_AUTHORIZATION, BEARER_PREFIX + authToken)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request))
+            )
+                .andExpect(status().isCreated)
+                .andExpect(jsonPath(JSON_PATH_NAME).value(CATEGORY_WORK))
+                .andExpect(jsonPath(JSON_PATH_COLOR).value(COLOR_RED))
+        }
+
+        @Test
         fun `should return 400 when name is empty`() {
             val request = mapOf(
                 KEY_NAME to "",
@@ -419,6 +456,45 @@ class CategoryTests {
             )
                 .andExpect(status().isConflict)
                 .andExpect(jsonPath(JSON_PATH_ERROR).value(CATEGORY_EXISTS_MSG + " " + CATEGORY_PERSONAL))
+        }
+
+        @Test
+        fun `should return 409 when updating to existing category name with different case and spaces`() {
+            createCategory(CATEGORY_PERSONAL, COLOR_GREEN)
+            val categoryId = createCategory(CATEGORY_WORK, COLOR_RED)
+
+            val request = mapOf(
+                KEY_NAME to "  ${CATEGORY_PERSONAL.lowercase()}  "
+            )
+
+            mockMvc.perform(
+                put(BASE_URL + "/" + categoryId)
+                    .header(HEADER_AUTHORIZATION, BEARER_PREFIX + authToken)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request))
+            )
+                .andExpect(status().isConflict)
+                .andExpect(jsonPath(JSON_PATH_ERROR).value(CATEGORY_EXISTS_MSG + " " + CATEGORY_PERSONAL.lowercase()))
+        }
+
+        @Test
+        fun `should trim category name and color when updating`() {
+            val categoryId = createCategory(CATEGORY_WORK, COLOR_RED)
+
+            val request = mapOf(
+                KEY_NAME to "  $CATEGORY_WORK_UPDATED  ",
+                KEY_COLOR to "  $COLOR_GREEN  "
+            )
+
+            mockMvc.perform(
+                put(BASE_URL + "/" + categoryId)
+                    .header(HEADER_AUTHORIZATION, BEARER_PREFIX + authToken)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request))
+            )
+                .andExpect(status().isOk)
+                .andExpect(jsonPath(JSON_PATH_NAME).value(CATEGORY_WORK_UPDATED))
+                .andExpect(jsonPath(JSON_PATH_COLOR).value(COLOR_GREEN))
         }
 
         @Test

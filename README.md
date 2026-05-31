@@ -23,6 +23,7 @@ A **Spring Boot** RESTful API for a personal note-taking application with JWT au
   - Organize notes with custom categories
   - Color-coded categories for visual organization
   - CRUD operations for category management
+  - Category names are trimmed and unique per user, case-insensitively (`Work` and `work` are considered duplicates)
 
 - **Security**
   - Spring Security with JWT tokens
@@ -67,10 +68,11 @@ flowchart TD
 
     actions --> notes["Create, view, update, and delete notes"]
     actions --> categories["Create, view, update, and delete categories"]
+    categories --> categoryRules["Validate category name: trim spaces and reject case-insensitive duplicates per user"]
     actions --> logout["Logout"]
 
     notes --> database["PostgreSQL database"]
-    categories --> database
+    categoryRules --> database
     logout --> finished["Session finished on client"]
 
     database --> saved["User data is stored separately and securely"]
@@ -82,7 +84,7 @@ flowchart TD
 
 - Java 17 or higher
 - PostgreSQL 12+
-- Gradle (or use the included wrapper)
+- Gradle is optional because this project includes the Gradle wrapper (`./gradlew`)
 
 ### Setup
 
@@ -93,39 +95,55 @@ flowchart TD
    ```
 
 2. **Create database**
-   
-   Create a PostgreSQL database (tables will be auto-created on first run):
+    
+   Create a PostgreSQL database. Flyway will create the schema and tables when the application starts.
    ```sql
    CREATE DATABASE mynotes;
    ```
-   
+    
    Or using psql:
    ```bash
-   psql -U postgres -c "CREATE DATABASE mynotes;"
+   psql -U your_username -c "CREATE DATABASE mynotes;"
    ```
 
 3. **Configure database connection**
-   
-   Update `src/main/resources/application.properties`:
+    
+   Create a local configuration file named `local.properties` in the project root. This file is ignored by Git and is automatically imported by the application.
    ```properties
-   spring.datasource.url=jdbc:postgresql://localhost:5432/mynotes
-   spring.datasource.username=your_username
-   spring.datasource.password=your_password
+   DB_URL=jdbc:postgresql://localhost:5432/mynotes
+   DB_USERNAME=your_username
+   DB_PASSWORD=your_password
+   ```
+
+   If your PostgreSQL user does not use a password, leave it empty:
+   ```properties
+   DB_PASSWORD=
    ```
 
 4. **Configure JWT** (optional)
-   
-   Update JWT settings in `application.properties`:
+    
+   Add JWT settings to `local.properties` if you want to override the defaults:
    ```properties
-   jwt.secret=your-256-bit-secret-key-here-minimum-32-characters
-   jwt.expiration=86400000
+   JWT_SECRET=your-256-bit-secret-key-here-minimum-32-characters
    ```
 
 5. **Run the application**
    ```bash
    ./gradlew bootRun
    ```
-   
+
+   To run with development seed data, use the `dev` profile:
+   ```bash
+   ./gradlew bootRun --args='--spring.profiles.active=dev'
+   ```
+
+   The `dev` profile seeds demo users, categories, and notes if they do not already exist:
+
+   | Email | Password |
+   |-------|----------|
+   | `demo@mynotes.com` | `password` |
+   | `john@example.com` | `password` |
+     
    Or build and run the JAR:
    ```bash
    ./gradlew build

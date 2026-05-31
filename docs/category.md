@@ -150,8 +150,8 @@ POST /api/categories
 
 | Field | Type | Required | Validation |
 |-------|------|----------|------------|
-| name | string | Yes | 2-100 characters, unique per user |
-| color | string | No | Max 7 characters (hex color) |
+| name | string | Yes | 2-100 characters, trimmed, unique per user case-insensitively |
+| color | string | No | Max 20 characters |
 
 ### Request Example
 
@@ -231,8 +231,8 @@ PUT /api/categories/{id}
 
 | Field | Type | Required | Validation |
 |-------|------|----------|------------|
-| name | string | Yes | 2-100 characters, unique per user |
-| color | string | No | Max 7 characters (hex color) |
+| name | string | Yes | 2-100 characters, trimmed, unique per user case-insensitively |
+| color | string | No | Max 20 characters |
 
 ### Request Example
 
@@ -362,7 +362,7 @@ curl -X DELETE http://localhost:8080/api/categories/1 \
 |-------|------|---------------|
 | name | Required, not blank | "Category name is required" |
 | name | Min 2, Max 100 characters | "Category name must be between 2 and 100 characters" |
-| name | Unique per user | "Category already exists with name: ..." |
+| name | Unique per user, case-insensitive after trimming | "Category already exists with name: ..." |
 | color | Max 20 characters | "Color must be at most 20 characters" |
 
 **Note:** The `name` and `color` fields are automatically trimmed of leading/trailing whitespace before processing.
@@ -388,7 +388,7 @@ curl -X DELETE http://localhost:8080/api/categories/1 \
 ## Notes
 
 - **User Isolation:** All categories are scoped to the authenticated user. Users can only access, modify, and delete their own categories.
-- **Unique Names:** Category names must be unique per user. Attempting to create or update a category with an existing name will return a 409 Conflict error.
+- **Unique Names:** Category names must be unique per user after trimming and ignoring case. For example, `Work`, `work`, and `  WORK  ` are considered duplicates and return a 409 Conflict error.
 - **Self-Update:** Updating a category with the same name is allowed (no conflict).
 - **Notes Relationship:** When a category is deleted, notes that were assigned to that category will have their reference cleared (`categoryId` set to `null`).
-- **Color Format:** The `color` field accepts any string up to 7 characters. Typically used for hex color codes (e.g., "#3498db").
+- **Color Format:** The `color` field accepts any string up to 20 characters. Typically used for hex color codes (e.g., "#3498db").
